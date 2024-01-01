@@ -11,5 +11,6 @@ glad_dep = declare_dependency(
 executable('program_executable',
   'src/main.c',
   dependencies: [glfw_dep, glad_dep],
+  link_args: '-lm',
   c_args: ['-g']
 )
