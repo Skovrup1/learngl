@@ -5,7 +5,7 @@ glfw_dep = dependency('glfw3')
 glad_dep = declare_dependency(
   sources: files('glad/glad.c'),
   include_directories: include_directories('glad'),
-  compile_args: ['-Wno-everything'],
+  compile_args: ['-w'],
 )
 
 executable('program_executable',

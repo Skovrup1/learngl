@@ -15,19 +15,20 @@ void render();
 
 const char *vertex_source = "#version 330 core\n"
                             "layout (location = 0) in vec3 aPos;\n"
-                            "out vec4 vertex_color;"
+                            "layout (location = 1) in vec3 color_attr;\n"
+                            "out vec3 our_color;\n"
                             "void main()\n"
                             "{\n"
                             "   gl_Position = vec4(aPos, 1.0);\n"
-                            "   vertex_color = vec4(0.5, 0.0, 0.0, 1.0);"
+                            "   our_color = color_attr;"
                             "}\0";
 
 const char *fragment_source = "#version 330 core\n"
                               "out vec4 FragColor;\n"
-                              "uniform vec4 our_color;"
+                              "in vec3 our_color;\n"
                               "void main()\n"
                               "{\n"
-                              "    FragColor = our_color;"
+                              "    FragColor = vec4(our_color, 1.0);"
                               "}\0";
 
 int main() {
@@ -87,9 +88,14 @@ int main() {
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
 
-    float vertices[] = {0.5f,  0.5f,  0.0f, 0.5f,  -0.5f, 0.0f,
-                        -0.5f, -0.5f, 0.0f, -0.5f, 0.5f,  0.0};
-    unsigned int indices[] = {0, 1, 3, 1, 2, 3};
+    float vertices[] = {
+        // positions         // colors
+        0.5f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+        0.0f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
+    };
+
+    unsigned int indices[] = {0, 1, 2};
 
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -106,9 +112,16 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                  GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+    int attr_stride = 6 * sizeof(float);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                           (void *)0);
     glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                          (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
